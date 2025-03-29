@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 import chromadb
 import boto3
@@ -6,8 +7,12 @@ from botocore.exceptions import NoCredentialsError
 
 app = FastAPI()
 
-# Initialize ChromaDB in-memory (Replace with EC2-hosted instance if needed)
-chroma_client = chromadb.PersistentClient(path="/tmp/chroma")  # Change path if needed
+# Ensure the directory exists
+CHROMA_DB_PATH = "./data/chromadb"
+os.makedirs(CHROMA_DB_PATH, exist_ok=True)
+
+# Initialize ChromaDB with persistent storage
+chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
 collection = chroma_client.get_or_create_collection(name="clothing")
 
 # Initialize S3 client
