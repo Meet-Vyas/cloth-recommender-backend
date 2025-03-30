@@ -1,5 +1,4 @@
 import json
-import uuid
 
 import boto3
 import psycopg2
@@ -149,7 +148,7 @@ def get_recommendations():
 
         # Query clothing items for the given weather, user and optional style
         query = """
-        SELECT style, type, category, color, image_id
+        SELECT style, type, category, color, image_url
         FROM clothing_items
         WHERE weather = %s AND user_id = %s
         """
@@ -180,7 +179,7 @@ def get_recommendations():
             item_type = row[1]
             category = row[2]
             color = row[3]
-            image_id = row[4]
+            image_url = row[4]
 
             # Add items to the appropriate category
             if item_type == "top":
@@ -189,7 +188,7 @@ def get_recommendations():
                 recommendations["top"][style].append({
                     "category": category,
                     "color": color,
-                    "imageId": image_id
+                    "imageUrl": image_url
                 })
             elif item_type == "bottom":
                 if style not in recommendations["bottom"]:
@@ -197,19 +196,19 @@ def get_recommendations():
                 recommendations["bottom"][style].append({
                     "category": category,
                     "color": color,
-                    "imageId": image_id
+                    "imageUrl": image_url
                 })
             elif item_type == "shoes":
                 recommendations["shoes"].append({
                     "category": category,
                     "color": color,
-                    "imageId": image_id
+                    "imageUrl": image_url
                 })
             elif item_type == "watch":
                 recommendations["watch"].append({
                     "category": category,
                     "color": color,
-                    "imageId": image_id
+                    "imageUrl": image_url
                 })
 
         recommender = ClothingRecommender()

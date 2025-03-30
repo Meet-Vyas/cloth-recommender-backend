@@ -47,8 +47,8 @@ Wardrobe information:
 
 {avoid_str}
 
-Return ONLY a JSON object with these keys: "top", "bottom", "shoes", "watch". For each key, provide ONLY the imageId.
-Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "imageId", "shoes": "imageId", "watch": "imageId"}}
+Return ONLY a JSON object with these keys: "top", "bottom", "shoes", "watch". For each key, provide ONLY the imageUrl.
+Your response must be EXACTLY in this format: {{"top": "imageUrl", "bottom": "imageUrl", "shoes": "imageUrl", "watch": "imageUrl"}}
 """
         return prompt
 
@@ -56,7 +56,7 @@ Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "ima
         try:
             body = {
                 "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 150,
+                "max_tokens": 1000,
                 "messages": [{"role": "user", "content": prompt}]
             }
 
@@ -70,7 +70,18 @@ Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "ima
             result = json.loads(response['body'].read())
             response_text = result['content'][0]['text'].strip()
 
-            llm_response = json.loads(response_text)
+            # Print the raw response for debugging
+            print(f"Raw LLM response: {response_text}")
+
+            # Extract JSON from response (handles cases where model adds explanatory text)
+            json_start = response_text.find('{')
+            json_end = response_text.rfind('}') + 1
+            if json_start >= 0 and json_end > 0:
+                json_text = response_text[json_start:json_end]
+                llm_response = json.loads(json_text)
+            else:
+                raise ValueError("No JSON object found in response")
+
             return {
                 "top": llm_response.get("top"),
                 "bottom": llm_response.get("bottom"),
@@ -79,6 +90,7 @@ Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "ima
             }
         except Exception as e:
             print(f"Error with LLM call: {str(e)}")
+            print(f"Failed to parse response: {response_text if 'response_text' in locals() else 'No response'}")
             return {
                 "top": None,
                 "bottom": None,
@@ -96,21 +108,21 @@ Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "ima
 
         if "top" in context_info:
             if "casual" in context_info["top"]:
-                result["top"] = context_info["top"]["casual"][0]["imageId"]
+                result["top"] = context_info["top"]["casual"][0]["imageUrl"]
             elif "formal" in context_info["top"]:
-                result["top"] = context_info["top"]["formal"][0]["imageId"]
+                result["top"] = context_info["top"]["formal"][0]["imageUrl"]
 
         if "bottom" in context_info:
             if "casual" in context_info["bottom"]:
-                result["bottom"] = context_info["bottom"]["casual"][0]["imageId"]
+                result["bottom"] = context_info["bottom"]["casual"][0]["imageUrl"]
             elif "formal" in context_info["bottom"]:
-                result["bottom"] = context_info["bottom"]["formal"][0]["imageId"]
+                result["bottom"] = context_info["bottom"]["formal"][0]["imageUrl"]
 
         if "shoes" in context_info and context_info["shoes"]:
-            result["shoes"] = context_info["shoes"][0]["imageId"]
+            result["shoes"] = context_info["shoes"][0]["imageUrl"]
 
         if "watch" in context_info and context_info["watch"]:
-            result["watch"] = context_info["watch"][0]["imageId"]
+            result["watch"] = context_info["watch"][0]["imageUrl"]
 
         return result
 
@@ -141,10 +153,10 @@ Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "ima
 
         # Check if the category exists in context_info and it's a list
         if category in context_info:
-            # Make sure it's a list and then extract the "imageId"
+            # Make sure it's a list and then extract the "imageUrl"
             if isinstance(context_info[category], list):
-                items = [item["imageId"] for item in context_info[category] if
-                         isinstance(item, dict) and "imageId" in item]
+                items = [item["imageUrl"] for item in context_info[category] if
+                         isinstance(item, dict) and "imageUrl" in item]
             else:
                 print(f"Warning: Expected a list for category '{category}', but got {type(context_info[category])}")
 
