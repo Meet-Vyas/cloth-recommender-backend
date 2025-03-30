@@ -21,8 +21,6 @@ class ClothingRecommender:
         if not response:
             return self._fallback_selection(context_info)
 
-        # Remove check for "too similar" since we are not using it anymore
-
         self.previous_outfits.append(response)
         if len(self.previous_outfits) > self.max_history:
             self.previous_outfits.pop(0)
@@ -67,13 +65,29 @@ Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "ima
             result = json.loads(response['body'].read())
             response_text = result['content'][0]['text'].strip()
 
-            return json.loads(response_text)
+            llm_response = json.loads(response_text)
+            return {
+                "top": llm_response.get("top"),
+                "bottom": llm_response.get("bottom"),
+                "shoes": llm_response.get("shoes"),
+                "watch": llm_response.get("watch")
+            }
         except Exception as e:
             print(f"Error with LLM call: {str(e)}")
-            return {}
+            return {
+                "top": None,
+                "bottom": None,
+                "shoes": None,
+                "watch": None
+            }
 
     def _fallback_selection(self, context_info: Dict[str, Any]) -> Dict[str, str]:
-        result = {}
+        result = {
+            "top": None,
+            "bottom": None,
+            "shoes": None,
+            "watch": None
+        }
 
         if "top" in context_info:
             if "casual" in context_info["top"]:
@@ -130,37 +144,3 @@ Your response must be EXACTLY in this format: {{"top": "imageId", "bottom": "ima
                 print(f"Warning: Expected a list for category '{category}', but got {type(context_info[category])}")
 
         return items
-
-
-def load_json_file(filename: str) -> Dict[str, Any]:
-    """Load JSON data from a file."""
-    try:
-        with open(filename, 'r', encoding='utf-8') as file:
-            return json.load(file)
-    except Exception as e:
-        print(f"Error reading JSON file: {str(e)}")
-        return {}
-
-
-def main():
-    recommender = ClothingRecommender()
-
-    # Load wardrobe data from a JSON file
-    context_info = load_json_file('wardrobe.json')
-
-    if not context_info:
-        print("Failed to load wardrobe data.")
-        return
-
-    # Test multiple recommendations to see variation
-    for i in range(3):
-        result = recommender.recommend_outfit(context_info)
-        print(f"Outfit {i + 1}: {json.dumps(result, indent=2)}")
-
-        # Generate alternative outfit for the current recommendation
-        alt_outfit = recommender.generate_alternative_outfit(context_info, result)
-        print(f"Alternative Outfit {i + 1}: {json.dumps(alt_outfit, indent=2)}")
-
-
-if __name__ == "__main__":
-    main()
