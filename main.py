@@ -243,5 +243,15 @@ def get_all_images():
         return jsonify({"error": str(e)}), 500
 
 
+import os
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    home_dir = os.path.expanduser('~')
+    cert_path = os.path.join(home_dir, 'ssl_certs/cert.pem')
+    key_path = os.path.join(home_dir, 'ssl_certs/key.pem')
+
+    app.run(
+        host='0.0.0.0',
+        debug=True,
+        ssl_context=(cert_path, key_path)
+    )

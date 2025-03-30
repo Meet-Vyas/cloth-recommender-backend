@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-
+# AI help taken from perplexity.ai
 def get_files_in_directory(path, parent_path=[]):
     """Recursively retrieve files and their full paths in the directory"""
     all_files = []
