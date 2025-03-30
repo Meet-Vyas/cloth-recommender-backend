@@ -1,12 +1,14 @@
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
-import chromadb
-import boto3
+import json
+import os
 import uuid
+
+import boto3
 import psycopg2
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-import boto3
-from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+
+from llm import ClothingRecommender
 
 app = Flask(__name__)
 
@@ -195,6 +197,11 @@ def get_recommendations():
                     "imageId": image_id
                 })
 
+        recommender = ClothingRecommender()
+        result = recommender.recommend_outfit(recommendations)
+        print(json.dumps(result))
+
+        # Return the recommendations as JSON
         return jsonify(recommendations)
 
     except Exception as e:
