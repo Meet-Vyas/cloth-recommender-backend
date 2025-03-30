@@ -7,10 +7,13 @@ import psycopg2
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
+from flask_cors import CORS
 
 from llm import ClothingRecommender
 
 app = Flask(__name__)
+CORS(app)
+
 
 # Database connection settings (local PostgreSQL)
 DB_HOST = 'localhost'
@@ -79,17 +82,23 @@ def upload_image():
 
         # Generate unique image ID
         image_id = str(uuid.uuid4())
-        filename = secure_filename(image_id)  # No extension restriction
+        filename = secure_filename(image.filename)  # Get the original file name
 
-        # Define storage path
-        image_path = f"{BUCKET_NAME}/{user_id}/{style}/{type_}/{category}/{filename}"
+        # Define the S3 storage path
+        s3_key = f"{user_id}/{style}/{type_}/{category}/{filename}"
 
-        # Save the file locally (for now)
-        local_folder = f"uploads/{user_id}/{style}/{type_}/{category}"
-        os.makedirs(local_folder, exist_ok=True)
-        image.save(os.path.join(local_folder, filename))
+        # Upload the image to S3
+        s3 = boto3.client('s3',
+                          aws_access_key_id=AWS_ACCESS_KEY_ID,
+                          aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
 
-        # Store in PostgreSQL
+        # Upload the image to S3
+        s3.upload_fileobj(image, BUCKET_NAME, s3_key)
+
+        # Generate the S3 URL
+        image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
+
+        # Store metadata in PostgreSQL
         conn = connect_to_db()
         if conn:
             cur = conn.cursor()
@@ -98,7 +107,7 @@ def upload_image():
                 INSERT INTO clothing_items (image_id, style, type, weather, user_id, category, color, image_url)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """,
-                (image_id, style, type_, weather, user_id, category, color, image_path)
+                (image_id, style, type_, weather, user_id, category, color, image_url)
             )
             conn.commit()
             cur.close()
@@ -106,7 +115,7 @@ def upload_image():
         else:
             return jsonify({"error": "Database connection failed"}), 500
 
-        return jsonify({"message": "Image uploaded successfully", "image_id": image_id, "image_url": image_path})
+        return jsonify({"message": "Image uploaded successfully", "image_id": image_id, "image_url": image_url})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
