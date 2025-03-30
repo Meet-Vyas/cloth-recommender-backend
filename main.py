@@ -223,5 +223,45 @@ def get_recommendations():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/images', methods=['GET'])
+def get_all_images():
+    try:
+        # Connect to the database
+        conn = connect_to_db()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+
+        cur = conn.cursor()
+
+        # Always use user_id 123
+        user_id = "123"
+
+        # Simplified query to fetch only the needed fields
+        query = """
+        SELECT style, type, image_url
+        FROM clothing_items
+        WHERE user_id = %s
+        """
+        cur.execute(query, (user_id,))
+
+        rows = cur.fetchall()
+        conn.close()
+
+        # Format the response with only the three required fields
+        images = []
+        for row in rows:
+            style, type_, image_url = row
+            images.append({
+                "style": style,
+                "type": type_,
+                "imageUrl": image_url
+            })
+
+        return jsonify({"images": images})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
