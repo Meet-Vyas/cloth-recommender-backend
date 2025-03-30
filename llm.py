@@ -8,7 +8,12 @@ class ClothingRecommender:
 
     def __init__(self):
         self.model_id = 'arn:aws:bedrock:us-east-1:836537608680:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0'
-        self.bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
+        self.bedrock = boto3.client(
+            'bedrock-runtime',
+            region_name='us-east-1',
+            aws_access_key_id='AKIA4FRMG5HUOC65OWNV',
+            aws_secret_access_key='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'
+        )
         self.previous_outfits = []  # Store previous outfit recommendations
         self.max_history = 3  # Remember last 3 outfits to avoid repetition
 

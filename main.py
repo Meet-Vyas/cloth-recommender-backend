@@ -16,8 +16,9 @@ CORS(app)
 
 # Database connection settings (local PostgreSQL)
 DB_HOST = 'localhost'
-DB_NAME = 'myappdb'
-DB_USER = 'meet'
+DB_NAME = 'clothes_app'
+#  table name: clothing_items
+DB_USER = 'postgres'
 DB_PASS = '123'
 
 # S3 Bucket name placeholder (Replace when deploying)
@@ -79,12 +80,15 @@ def upload_image():
         color = request.form['color']
         image = request.files['image']
 
-        # Generate unique image ID
-        image_id = str(uuid.uuid4())
+        # Get the secure filename and extract UUID from it
         filename = secure_filename(image.filename)  # Get the original file name
+        print(f"Image filename: {filename}")
+        image_id = filename.split('.')[0]  # Extract UUID from filename (assuming format is UUID.png)
+        print(f"Extracted image ID: {image_id}")
 
         # Define the S3 storage path
         s3_key = f"{user_id}/{style}/{type_}/{category}/{filename}"
+        print(f"S3 key: {s3_key}")
 
         # Upload the image to S3
         s3 = boto3.client('s3',
@@ -96,6 +100,7 @@ def upload_image():
 
         # Generate the S3 URL
         image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
+        print(f"Image URL: {image_url}")
 
         # Store metadata in PostgreSQL
         conn = connect_to_db()
@@ -167,6 +172,8 @@ def get_recommendations():
             "watch": []
         }
 
+        print("Row size:", len(rows))
+
         # Organize clothing items into the appropriate categories
         for row in rows:
             style = row[0]
@@ -218,4 +225,4 @@ def get_recommendations():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
