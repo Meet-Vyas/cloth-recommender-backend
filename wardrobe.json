@@ -1,0 +1,51 @@
+{
+    "weather": "summer",
+    "top": {
+        "casual": [
+            {"category": "T-shirt", "color": "#000000", "imageId": "abc123.jpg"},
+            {"category": "shirt", "color": "#ffffff", "imageId": "def456.jpg"},
+            {"category": "polo", "color": "#0073cf", "imageId": "polo789.jpg"},
+            {"category": "T-shirt", "color": "#f5f5dc", "imageId": "beige123.jpg"},
+            {"category": "shirt", "color": "#87ceeb", "imageId": "skyblue456.jpg"}
+        ],
+        "formal": [
+            {"category": "shirt", "color": "#ffffff", "imageId": "whitedress123.jpg"},
+            {"category": "shirt", "color": "#87ceeb", "imageId": "bluedress456.jpg"},
+            {"category": "shirt", "color": "#f5f5dc", "imageId": "beigedress789.jpg"}
+        ]
+    },
+    "bottom": {
+        "casual": [
+            {"category": "jeans", "color": "#000080", "imageId": "navy789.jpg"},
+            {"category": "shorts", "color": "#f5f5dc", "imageId": "beige567.jpg"},
+            {"category": "pants", "color": "#808080", "imageId": "grey123.jpg"},
+            {"category": "jeans", "color": "#000000", "imageId": "black456.jpg"},
+            {"category": "shorts", "color": "#ffffff", "imageId": "white789.jpg"}
+        ],
+        "formal": [
+            {"category": "pants", "color": "#000000", "imageId": "blackdress123.jpg"},
+            {"category": "pants", "color": "#000080", "imageId": "navydress456.jpg"},
+            {"category": "pants", "color": "#808080", "imageId": "greydress789.jpg"},
+            {"category": "pants", "color": "#f5f5dc", "imageId": "beigedress012.jpg"},
+            {"category": "pants", "color": "#8b4513", "imageId": "browndress345.jpg"}
+        ]
+    },
+    "shoes": [
+        {"category": "sneakers", "color": "#000000", "imageId": "blacksneakers.jpg"},
+        {"category": "formal", "color": "#8b4513", "imageId": "brownformal.jpg"},
+        {"category": "casual", "color": "#ffffff", "imageId": "whitecasual.jpg"},
+        {"category": "sneakers", "color": "#0073cf", "imageId": "bluesneakers.jpg"},
+        {"category": "sandals", "color": "#f5f5dc", "imageId": "beigesandals.jpg"},
+        {"category": "formal", "color": "#000000", "imageId": "blackformal.jpg"},
+        {"category": "loafers", "color": "#000080", "imageId": "navyloafers.jpg"}
+    ],
+    "watch": [
+        {"category": "digital", "color": "#000000", "imageId": "blackdigital.jpg"},
+        {"category": "smart", "color": "#c0c0c0", "imageId": "silverwatch.jpg"},
+        {"category": "analogue", "color": "#8b4513", "imageId": "brownwatch.jpg"},
+        {"category": "smart", "color": "#ffffff", "imageId": "whitewatch.jpg"},
+        {"category": "sports", "color": "#0073cf", "imageId": "bluewatch.jpg"},
+        {"category": "luxury", "color": "#ffd700", "imageId": "goldwatch.jpg"},
+        {"category": "dress", "color": "#000000", "imageId": "blackdresswatch.jpg"}
+    ]
+}
