@@ -2,3 +2,5 @@
 wics.pem
 __pycache__/
 data
+chroma_db
+folder_structure.xlsx
