@@ -207,11 +207,12 @@ def get_recommendations():
                 })
 
         recommender = ClothingRecommender()
+        print(recommendations)
         result = recommender.recommend_outfit(recommendations)
         print(json.dumps(result))
 
         # Return the recommendations as JSON
-        return jsonify(recommendations)
+        return jsonify(result)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
