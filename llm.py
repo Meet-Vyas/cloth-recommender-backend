@@ -235,7 +235,7 @@ class ClothingRecommender:
                 output[category] = self.select_item(items, category, weather)
         
         return {k: v for k, v in output.items() if v is not None}
-
+ 
 def main():
     recommender = ClothingRecommender()
     
