@@ -151,3 +151,5 @@ Your response must be EXACTLY in this format: {{"top": "imageUrl", "bottom": "im
                 print(f"Warning: Expected a list for category '{category}', but got {type(context_info[category])}")
 
         return items
+
+# AI help taken from perplexity.ai
