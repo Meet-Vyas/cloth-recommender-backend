@@ -1,13 +1,12 @@
 import json
-import os
 import uuid
 
 import boto3
 import psycopg2
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from flask import Flask, request, jsonify
-from werkzeug.utils import secure_filename
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 
 from llm import ClothingRecommender
 
