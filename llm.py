@@ -14,12 +14,10 @@ class ClothingRecommender:
             aws_access_key_id='AKIA4FRMG5HUOC65OWNV',
             aws_secret_access_key='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'
         )
-        self.previous_outfits = []  # Store previous outfit recommendations
-        self.max_history = 3  # Remember last 3 outfits to avoid repetition
+        self.previous_outfits = []
+        self.max_history = 3
 
     def recommend_outfit(self, context_info: Dict[str, Any]) -> Dict[str, str]:
-        """Generate a color-coordinated outfit recommendation using Claude."""
-
         prompt = self._build_prompt(context_info)
         response = self._call_llm(prompt)
 
@@ -70,10 +68,8 @@ Your response must be EXACTLY in this format: {{"top": "imageUrl", "bottom": "im
             result = json.loads(response['body'].read())
             response_text = result['content'][0]['text'].strip()
 
-            # Print the raw response for debugging
             print(f"Raw LLM response: {response_text}")
 
-            # Extract JSON from response (handles cases where model adds explanatory text)
             json_start = response_text.find('{')
             json_end = response_text.rfind('}') + 1
             if json_start >= 0 and json_end > 0:
@@ -133,14 +129,11 @@ Your response must be EXACTLY in this format: {{"top": "imageUrl", "bottom": "im
         alt_outfit = current_outfit.copy()
 
         for category in categories:
-            # Get available items for the category
             available_items = self.get_items_for_category(context_info, category)
 
-            # Filter out the current item in the outfit
             alternative_items = [item for item in available_items if item != alt_outfit.get(category)]
 
             if alternative_items:
-                # Randomly select an alternative item
                 alt_outfit[category] = random.choice(alternative_items)
             else:
                 print(f"No alternatives available for {category}")
@@ -148,12 +141,9 @@ Your response must be EXACTLY in this format: {{"top": "imageUrl", "bottom": "im
         return alt_outfit
 
     def get_items_for_category(self, context_info: Dict[str, Any], category: str) -> List[str]:
-        """Get all items available for a specific category."""
         items = []
 
-        # Check if the category exists in context_info and it's a list
         if category in context_info:
-            # Make sure it's a list and then extract the "imageUrl"
             if isinstance(context_info[category], list):
                 items = [item["imageUrl"] for item in context_info[category] if
                          isinstance(item, dict) and "imageUrl" in item]

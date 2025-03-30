@@ -20,10 +20,8 @@ DB_NAME = 'clothes_app'
 DB_USER = 'postgres'
 DB_PASS = '123'
 
-# S3 Bucket name placeholder (Replace when deploying)
 BUCKET_NAME = "wics-cloth-recommender-images"
 
-# AWS Credentials (for development purposes, replace with your actual keys)
 AWS_ACCESS_KEY_ID = 'AKIA4FRMG5HUOC65OWNV'
 AWS_SECRET_ACCESS_KEY = 'lb1ZJkk6qbTAzTEsXhkjW5Qet5Rj7hu/JcItTs/x'
 
@@ -79,29 +77,23 @@ def upload_image():
         color = request.form['color']
         image = request.files['image']
 
-        # Get the secure filename and extract UUID from it
-        filename = secure_filename(image.filename)  # Get the original file name
+        filename = secure_filename(image.filename)
         print(f"Image filename: {filename}")
-        image_id = filename.split('.')[0]  # Extract UUID from filename (assuming format is UUID.png)
+        image_id = filename.split('.')[0]
         print(f"Extracted image ID: {image_id}")
 
-        # Define the S3 storage path
         s3_key = f"{user_id}/{style}/{type_}/{category}/{filename}"
         print(f"S3 key: {s3_key}")
 
-        # Upload the image to S3
         s3 = boto3.client('s3',
                           aws_access_key_id=AWS_ACCESS_KEY_ID,
                           aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
 
-        # Upload the image to S3
         s3.upload_fileobj(image, BUCKET_NAME, s3_key)
 
-        # Generate the S3 URL
         image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
         print(f"Image URL: {image_url}")
 
-        # Store metadata in PostgreSQL
         conn = connect_to_db()
         if conn:
             cur = conn.cursor()
@@ -127,7 +119,6 @@ def upload_image():
 @app.route('/recommend', methods=['GET'])
 def get_recommendations():
     try:
-        # Extract query parameters
         weather = request.args.get('weather')
         user_id = request.args.get('userId')
         style = request.args.get('style', None)  # Optional style parameter
@@ -135,18 +126,15 @@ def get_recommendations():
         if user_id != "123":
             return jsonify({"error": "Invalid user"}), 400
 
-        # Check if required parameters are present
         if not weather or not user_id:
             return jsonify({"error": "Missing required parameters"}), 400
 
-        # Connect to the database
         conn = connect_to_db()
         if not conn:
             return jsonify({"error": "Database connection failed"}), 500
 
         cur = conn.cursor()
 
-        # Query clothing items for the given weather, user and optional style
         query = """
         SELECT style, type, category, color, image_url
         FROM clothing_items
@@ -162,7 +150,6 @@ def get_recommendations():
         rows = cur.fetchall()
         conn.close()
 
-        # Generate recommendations JSON
         recommendations = {
             "weather": weather,
             "top": {},
@@ -173,7 +160,6 @@ def get_recommendations():
 
         print("Row size:", len(rows))
 
-        # Organize clothing items into the appropriate categories
         for row in rows:
             style = row[0]
             item_type = row[1]
@@ -181,7 +167,6 @@ def get_recommendations():
             color = row[3]
             image_url = row[4]
 
-            # Add items to the appropriate category
             if item_type == "top":
                 if style not in recommendations["top"]:
                     recommendations["top"][style] = []
@@ -216,7 +201,6 @@ def get_recommendations():
         result = recommender.recommend_outfit(recommendations)
         print(json.dumps(result))
 
-        # Return the recommendations as JSON
         return jsonify(result)
 
     except Exception as e:
@@ -226,17 +210,14 @@ def get_recommendations():
 @app.route('/images', methods=['GET'])
 def get_all_images():
     try:
-        # Connect to the database
         conn = connect_to_db()
         if not conn:
             return jsonify({"error": "Database connection failed"}), 500
 
         cur = conn.cursor()
 
-        # Always use user_id 123
         user_id = "123"
 
-        # Simplified query to fetch only the needed fields
         query = """
         SELECT style, type, image_url
         FROM clothing_items
@@ -247,7 +228,6 @@ def get_all_images():
         rows = cur.fetchall()
         conn.close()
 
-        # Format the response with only the three required fields
         images = []
         for row in rows:
             style, type_, image_url = row
