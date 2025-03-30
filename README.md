@@ -10,6 +10,7 @@ This is a backend system for a clothing recommendation app designed for a hackat
 - **API Endpoints**:
   - **POST** `/upload`: Uploads an image and stores metadata.
   - **GET** `/recommendations`: Retrieves clothing recommendations based on the stored items.
+  - **GET** `/images`: Retrieves all the image_urls for the front-end
 
 ## Tech Stack
 - **Backend**: Flask (Python)
